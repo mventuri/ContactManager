@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { Consumer } from "../../Context";
+import uuid from "uuid";
 
 class AddContact extends Component {
   state = {
@@ -7,9 +9,24 @@ class AddContact extends Component {
     phone: ""
   };
 
-  onSubmit = e => {
+  onSubmit = (dispatch, e) => {
     e.preventDefault();
-    console.log(this.state);
+    const { name, email, phone } = this.state;
+
+    const newContact = {
+      id: uuid(),
+      name,
+      email,
+      phone
+    };
+
+    dispatch({ type: "ADD_CONTACT", payload: newContact });
+
+    this.setState({
+      name: "",
+      email: "",
+      phone: ""
+    });
   };
 
   onChange = e => this.setState({ [e.target.name]: e.target.value });
@@ -17,51 +34,61 @@ class AddContact extends Component {
   render() {
     const { name, email, phone } = this.state;
     return (
-      <div className="card mb-3">
-        <div className="card-header">Add Contact</div>
-        <div className="card-body">
-          <form onSubmit={this.onSubmit}>
-            <div className="form-group">
-              <label htmlFor="name">Name</label>
-              <input
-                type="text"
-                className="form-control form-control-lg"
-                placeholder="Enter Name"
-                name="name"
-                value={name}
-                onChange={this.onChange}
-              />
+      <Consumer>
+        {value => {
+          const { dispatch } = value;
+          return (
+            <div className="card mb-3">
+              <div className="card-header">Add Contact</div>
+              <div className="card-body">
+                <form onSubmit={this.onSubmit.bind(this, dispatch)}>
+                  <div className="form-group">
+                    <label htmlFor="name">Name</label>
+                    <input
+                      type="text"
+                      className="form-control form-control-lg"
+                      placeholder="Enter Name"
+                      name="name"
+                      value={name}
+                      onChange={this.onChange}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="email">Email</label>
+                    <input
+                      type="email"
+                      className="form-control form-control-lg"
+                      placeholder="Enter Email"
+                      name="email"
+                      value={email}
+                      onChange={this.onChange}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="phone">Phone</label>
+                    <input
+                      type="number"
+                      className="form-control form-control-lg"
+                      placeholder="Enter Phone"
+                      name="phone"
+                      value={phone}
+                      onChange={this.onChange}
+                      required
+                    />
+                  </div>
+                  <input
+                    type="submit"
+                    value="Add Contact"
+                    className="btn btn-light btn-block"
+                  />
+                </form>
+              </div>
             </div>
-            <div className="form-group">
-              <label htmlFor="email">Email</label>
-              <input
-                type="email"
-                className="form-control form-control-lg"
-                placeholder="Enter Email"
-                name="email"
-                value={email}
-                onChange={this.onChange}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="phone">Phone</label>
-              <input
-                type="number"
-                className="form-control form-control-lg"
-                placeholder="Enter Phone"
-                name="phone"
-                value={phone}
-                onChange={this.onChange}
-              />
-            </div>
-            <input
-              type="submit"
-              value="Add Contact"
-              className="btn btn-light btn-block"
-            />
-          </form>
-        </div>
-      </div>
+          );
+        }}
+      </Consumer>
     );
   }
 }
